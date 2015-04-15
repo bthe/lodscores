@@ -1,0 +1,11 @@
+Package: lodscores
+Type: Package
+Title: Genetically determined close relatives
+Version: 1.0
+Date: 2015-04-14
+Author: Bjarki Elvarsson
+Maintainer: Bjarki Elvarsson <bthe@hafro.is>
+Description: Calculate genetically determined kinship based on LOD scores
+License: GPL (>= 2)
+Imports: Rcpp, plyr, reshape2, gstudio
+LinkingTo: Rcpp
