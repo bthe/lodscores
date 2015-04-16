@@ -36,6 +36,6 @@ LODscores <- function(dat.m){
   lod <- plyr::join(plyr::join(lod.po,lod.hs, 
                                by=c('ID1','ID2'), type='full'),
                     lod.fc, by=c('ID1','ID2'), type='full')
-  
+  lod$LOD_PO[is.na(lod$LOD_PO)] <- -999 
   return(lod)
 }

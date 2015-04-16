@@ -9,11 +9,21 @@ using namespace Rcpp;
 
 // [[Rcpp::export]]
 NumericVector calc_pval(NumericVector x, NumericVector y) {
-   int size = x.size();
-   NumericVector out(size);
-   
-   for(int i = 0; i < size; i++){
-     out(i) = mean(y>x(i));
+   int xn = x.size(), yn = y.size();
+   NumericVector out(xn);
+   // iteration variables
+   int i, j = 0; //xn - 1;
+   for(i = 0; i < xn; i++){
+     while(y(j)<x(i)){
+       j++;
+       if(j>=yn){
+         break;
+       }
+     }
+     out(i) = double(yn-j)/double(yn);
+     if(j>=yn){
+       break;
+     }
    }
    return out;
 }

@@ -1,4 +1,4 @@
-LODpval <- function(dat.p,n,.parallel=TRUE){
+LODpval <- function(dat.p,n,q=0.05,.parallel=TRUE){
   
   lod <- LODscores(dat.p$dat.m)
   num.fins <- length(unique(dat.p$dat.m$id))
@@ -12,14 +12,22 @@ LODpval <- function(dat.p,n,.parallel=TRUE){
                            tmp$iter <- x
                            return(tmp)
                          },.parallel=.parallel)
+  r <- 1:nrow(lod)
   
-  plyr::ddply(lod,~ID1+ID2,mutate,
-              p_PO = sum(lod.tmp$LOD_PO > LOD_PO[1],na.rm=TRUE)/(n*num.comp),
-              p_HS = sum(lod.tmp$LOD_HS > LOD_HS[1],na.rm=TRUE)/(n*num.comp),
-              p_FC = sum(lod.tmp$LOD_FC > LOD_FC[1],na.rm=TRUE)/(n*num.comp),
-              p_POc = pmin(p_PO*num.comp,1),
-              p_HSc = pmin(p_PO*num.comp,1),
-              p_FCc = pmin(p_PO*num.comp,1),
-              .parallel=.parallel)
+  lod <- arrange(lod,LOD_FC)
+  lod$p_FC <- calc_pval(lod$LOD_FC,sort(lod.tmp$LOD_FC)) 
+  lod$p_FCc <- pmin(1,num.comp*lod$p_FC)
+  lod$FC_FDR <- ifelse(lod$p_FC<((r/num.comp)*q),'Related','Unrelated')
   
+  lod <- arrange(lod,LOD_PO)
+  lod$p_PO <- calc_pval(lod$LOD_PO,sort(lod.tmp$LOD_PO))
+  lod$p_POc <- pmin(1,num.comp*lod$p_PO)
+  lod$PO_FDR <- ifelse(lod$p_PO<((r/num.comp)*q),'Related','Unrelated')
+  
+  lod <- arrange(lod,LOD_HS)
+  lod$p_HS <- calc_pval(lod$LOD_HS,sort(lod.tmp$LOD_HS))
+  lod$p_HSc <- pmin(1,num.comp*lod$p_HS) 
+  lod$HS_FDR <- ifelse(lod$p_HS<((r/num.comp)*q),'Related','Unrelated')
+  
+  return(lod)
 }
